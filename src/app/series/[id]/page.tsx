@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ReportButton from "@/components/ReportButton";
+import MessageButton from "@/components/MessageButton";
 
 const activityLabels: Record<string, string> = {
   SEDENTARY: "Sedentary",
@@ -200,8 +201,8 @@ export default function SeriesDetailPage() {
           <ReportButton seriesId={series.id} contentTitle={series.title} />
         </div>
 
-        {/* Book a Call CTA */}
-        {series.guide && !series.isGuide && (
+        {/* Book a Call / Message CTA */}
+        {series.guide && userId !== series.contributorId && (
           <div className="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 border-t border-teal-100">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div>
@@ -209,18 +210,25 @@ export default function SeriesDetailPage() {
                   Want personalized advice from {series.guide.name?.split(" ")[0]}?
                 </p>
                 <p className="text-sm text-gray-600">
-                  Book a 1-on-1 video call for real-time Q&A
+                  {series.guide.profile?.isAvailableForCalls
+                    ? "Book a 1-on-1 video call for real-time Q&A"
+                    : "Send them a message to connect"}
                 </p>
               </div>
-              <Link
-                href={`/book/${series.contributorId}`}
-                className="inline-flex items-center justify-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 font-medium text-sm whitespace-nowrap"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Book a Call
-              </Link>
+              <div className="flex items-center gap-2">
+                <MessageButton guideId={series.contributorId} />
+                {series.guide.profile?.isAvailableForCalls && (
+                  <Link
+                    href={`/book/${series.contributorId}`}
+                    className="inline-flex items-center justify-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 font-medium text-sm whitespace-nowrap"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Book a Call
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}
