@@ -240,8 +240,38 @@ export default function BookCallPage() {
     }
   }
 
+  const userRole = (session?.user as any)?.role;
+  const isGuideOnly = userRole === "GUIDE";
+
   if (loading) return <div className="max-w-2xl mx-auto px-4 py-8">Loading...</div>;
   if (!guide) return <div className="max-w-2xl mx-auto px-4 py-8">Guide not found.</div>;
+
+  if (isGuideOnly) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Link href={`/guides/${guideId}`} className="text-sm text-teal-600 hover:text-teal-700 mb-4 inline-block">
+          &larr; Back to Profile
+        </Link>
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <div className="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Want to book a session?</h2>
+          <p className="text-gray-600 mb-6">
+            Add a health profile so we can match you with the right guide.
+          </p>
+          <Link
+            href="/dashboard/seeker"
+            className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 font-medium transition-colors"
+          >
+            Set Up Health Profile
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const rate = guide.profile?.hourlyRate || 50;
   const price = duration === 60 ? rate : rate / 2;

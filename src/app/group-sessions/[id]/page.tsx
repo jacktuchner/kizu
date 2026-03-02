@@ -157,6 +157,9 @@ export default function GroupSessionDetailPage() {
     );
   }
 
+  const userRole = (authSession?.user as any)?.role;
+  const isGuideOnly = userRole === "GUIDE";
+
   const date = parseDate(groupSession.scheduledAt);
   const spotsLeft = groupSession.maxCapacity - groupSession.participantCount;
   const isFull = spotsLeft <= 0;
@@ -317,6 +320,24 @@ export default function GroupSessionDetailPage() {
             <p className="text-gray-500">This session has already started.</p>
           ) : isFull ? (
             <p className="text-gray-500 font-medium">This session is full.</p>
+          ) : isGuideOnly ? (
+            <div className="text-center">
+              <div className="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <p className="font-medium text-gray-900 mb-1">Want to join this session?</p>
+              <p className="text-sm text-gray-600 mb-4">
+                Add a health profile so we can match you with the right guide.
+              </p>
+              <Link
+                href="/dashboard/seeker"
+                className="inline-flex items-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 font-medium transition-colors"
+              >
+                Set Up Health Profile
+              </Link>
+            </div>
           ) : (
             <button
               onClick={handleSignUp}

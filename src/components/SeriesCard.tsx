@@ -12,6 +12,8 @@ interface SeriesCardProps {
   totalDuration?: number;
   matchScore?: number;
   matchBreakdown?: { attribute: string; matched: boolean; weight: number }[];
+  isOwn?: boolean;
+  hideMatchScore?: boolean;
 }
 
 function MatchScoreTooltip({ breakdown }: { breakdown: { attribute: string; matched: boolean; weight: number }[] }) {
@@ -66,7 +68,10 @@ export default function SeriesCard({
   totalDuration,
   matchScore,
   matchBreakdown,
+  isOwn,
+  hideMatchScore,
 }: SeriesCardProps) {
+  const showMatchScore = matchScore !== undefined && !hideMatchScore;
   return (
     <Link href={`/series/${id}`} className="block group">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-purple-200 transition-all">
@@ -77,7 +82,7 @@ export default function SeriesCard({
                 Series
               </span>
             </div>
-            {matchScore !== undefined && (
+            {showMatchScore && (
               <div className="flex items-center">
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                   matchScore >= 80 ? "bg-green-100 text-green-700" :
@@ -124,7 +129,14 @@ export default function SeriesCard({
           <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors line-clamp-2 mb-1">
             {title}
           </h3>
-          <p className="text-sm text-gray-500 mb-3">{guideName}</p>
+          <div className="flex items-center gap-1.5 mb-3">
+            <p className="text-sm text-gray-500">{guideName}</p>
+            {isOwn && (
+              <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">
+                Your series
+              </span>
+            )}
+          </div>
 
           <div className="flex flex-wrap gap-1.5 mb-3">
             <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">

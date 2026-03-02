@@ -362,6 +362,7 @@ export default function CommunityPage() {
             const typeLabel = FORUM_THREAD_TYPES.find((t) => t.value === thread.threadType)?.label || thread.threadType;
             const typeColor = threadTypeColors[thread.threadType] || "bg-gray-50 text-gray-700";
             const authorIsGuide = thread.author?.role === "GUIDE" || thread.author?.role === "BOTH" || thread.author?.role === "ADMIN";
+            const isOwnThread = !!session?.user && thread.author?.id === (session.user as any).id;
 
             return (
               <div
@@ -394,6 +395,11 @@ export default function CommunityPage() {
                     <div className="flex items-center gap-2 mt-1 text-xs text-gray-500">
                       <span className="font-medium text-gray-700">{thread.author?.name || "Anonymous"}</span>
                       {authorIsGuide && <VerifiedBadge />}
+                      {isOwnThread && (
+                        <span className="text-xs bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded-full font-medium">
+                          Your post
+                        </span>
+                      )}
                       <span>&middot;</span>
                       <span>{timeAgo(thread.createdAt)}</span>
                     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import FilterSidebar from "@/components/FilterSidebar";
 import ContentAcknowledgmentModal from "@/components/ContentAcknowledgmentModal";
@@ -50,7 +51,7 @@ interface Guide {
   matchBreakdown?: { attribute: string; matched: boolean; weight: number }[];
 }
 
-function GuideCard({ guide }: { guide: Guide }) {
+function GuideCard({ guide, isOwn, hideMatchScore }: { guide: Guide; isOwn?: boolean; hideMatchScore?: boolean }) {
   const profile = guide.profile || {};
   const averageRating = guide.reviewsReceived?.length
     ? guide.reviewsReceived.reduce((a, r) => a + r.rating, 0) / guide.reviewsReceived.length
@@ -88,7 +89,12 @@ function GuideCard({ guide }: { guide: Guide }) {
               </span>
             )}
           </div>
-          {guide.matchScore !== undefined && (
+          {isOwn && (
+            <span className="text-xs bg-cyan-50 text-cyan-600 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
+              Your profile
+            </span>
+          )}
+          {guide.matchScore !== undefined && !hideMatchScore && (
             <div className="flex items-center flex-shrink-0">
               <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${
                 guide.matchScore >= 80 ? "bg-green-100 text-green-700" :
@@ -175,6 +181,10 @@ function GuideCard({ guide }: { guide: Guide }) {
 
 function GuidesContent() {
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  const currentUserId = (session?.user as any)?.id as string | undefined;
+  const currentUserRole = (session?.user as any)?.role as string | undefined;
+  const isGuideOnly = currentUserRole === "GUIDE";
 
   const [filters, setFilters] = useState({
     procedures: [] as string[],
@@ -515,7 +525,12 @@ function GuidesContent() {
               ) : (
                 <div className="grid sm:grid-cols-2 gap-6">
                   {sortedGuides.map((c) => (
-                    <GuideCard key={c.id} guide={c} />
+                    <GuideCard
+                      key={c.id}
+                      guide={c}
+                      isOwn={!!currentUserId && c.id === currentUserId}
+                      hideMatchScore={isGuideOnly || (!!currentUserId && c.id === currentUserId)}
+                    />
                   ))}
                 </div>
               )}

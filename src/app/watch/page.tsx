@@ -22,6 +22,10 @@ function WatchContent() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
 
+  const currentUserId = (session?.user as any)?.id as string | undefined;
+  const currentUserRole = (session?.user as any)?.role as string | undefined;
+  const isGuideOnly = currentUserRole === "GUIDE";
+
   const [filters, setFilters] = useState({
     procedures: [] as string[],
     ageRanges: [] as string[],
@@ -394,6 +398,8 @@ function WatchContent() {
                         totalDuration={s.totalDuration}
                         matchScore={s.matchScore}
                         matchBreakdown={s.matchBreakdown}
+                        isOwn={!!currentUserId && s.guide?.id === currentUserId}
+                        hideMatchScore={isGuideOnly || (!!currentUserId && s.guide?.id === currentUserId)}
                       />
                     ))}
                   </div>
@@ -451,6 +457,8 @@ function WatchContent() {
                       matchScore={rec.matchScore}
                       matchBreakdown={rec.matchBreakdown}
                       guideVerified={rec.guide?.contributorStatus === "APPROVED"}
+                      isOwn={!!currentUserId && rec.guide?.id === currentUserId}
+                      hideMatchScore={isGuideOnly || (!!currentUserId && rec.guide?.id === currentUserId)}
                     />
                   ))}
                 </div>

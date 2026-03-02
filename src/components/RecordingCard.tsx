@@ -20,6 +20,8 @@ interface RecordingCardProps {
   matchScore?: number;
   matchBreakdown?: { attribute: string; matched: boolean; weight: number }[];
   guideVerified?: boolean;
+  isOwn?: boolean;
+  hideMatchScore?: boolean;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -86,8 +88,9 @@ function MatchScoreTooltip({ breakdown }: { breakdown: { attribute: string; matc
 export default function RecordingCard({
   id, title, guideName, procedureType, ageRange, activityLevel,
   category, durationSeconds, isVideo, thumbnailUrl, viewCount, averageRating, matchScore, matchBreakdown,
-  guideVerified,
+  guideVerified, isOwn, hideMatchScore,
 }: RecordingCardProps) {
+  const showMatchScore = matchScore !== undefined && !hideMatchScore;
   return (
     <Link href={`/recordings/${id}`} className="block group h-full">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-teal-200 transition-all h-full flex flex-col">
@@ -111,7 +114,7 @@ export default function RecordingCard({
                 <span className="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">
                   Video
                 </span>
-                {matchScore !== undefined && (
+                {showMatchScore && (
                   <div className="flex items-center">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                       matchScore >= 80 ? "bg-green-100 text-green-700" :
@@ -136,7 +139,7 @@ export default function RecordingCard({
                 <span className="text-xs font-medium bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">
                   {isVideo ? "Video" : "Audio"}
                 </span>
-                {matchScore !== undefined && (
+                {showMatchScore && (
                   <div className="flex items-center">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                       matchScore >= 80 ? "bg-green-100 text-green-700" :
@@ -170,6 +173,11 @@ export default function RecordingCard({
           <div className="flex items-center gap-1.5 mb-3">
             <p className="text-sm text-gray-500">{guideName}</p>
             {guideVerified && <VerifiedBadge />}
+            {isOwn && (
+              <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">
+                Your recording
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-1.5 mb-3 min-h-[3.25rem]">
