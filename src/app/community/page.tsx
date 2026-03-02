@@ -368,9 +368,8 @@ export default function CommunityPage() {
               <div
                 key={thread.id}
                 className={`bg-white border rounded-xl p-4 hover:border-teal-200 transition-colors ${
-                  thread.isPinned ? "border-teal-300 bg-teal-50/30" : isOwnThread ? "border-l-2 border-l-teal-300 border-gray-200" : "border-gray-200"
+                  thread.isPinned ? "border-teal-300 bg-teal-50/30" : "border-gray-200"
                 }`}
-                title={isOwnThread ? "Your post" : undefined}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -402,7 +401,25 @@ export default function CommunityPage() {
                   </div>
                   <div className="flex items-center gap-3 text-sm text-gray-500 flex-shrink-0">
                     {isOwnThread && (
-                      <span className="text-[11px] text-gray-400 italic sm:hidden">Yours</span>
+                      <button
+                        onClick={async () => {
+                          if (!confirm("Are you sure you want to delete this? This can\u2019t be undone.")) return;
+                          try {
+                            const res = await fetch(`/api/forum/threads/${thread.id}`, { method: "DELETE" });
+                            if (res.ok) {
+                              setThreads((prev) => prev.filter((t: any) => t.id !== thread.id));
+                            } else {
+                              const data = await res.json();
+                              alert(data.error || "Failed to delete thread");
+                            }
+                          } catch {
+                            alert("Failed to delete thread");
+                          }
+                        }}
+                        className="text-xs text-gray-500 hover:text-red-600 font-medium"
+                      >
+                        Delete
+                      </button>
                     )}
                     <div className="flex items-center gap-1" title="Replies">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

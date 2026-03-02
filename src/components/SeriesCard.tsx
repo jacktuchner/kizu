@@ -14,6 +14,7 @@ interface SeriesCardProps {
   matchBreakdown?: { attribute: string; matched: boolean; weight: number }[];
   isOwn?: boolean;
   hideMatchScore?: boolean;
+  onDelete?: () => void;
 }
 
 function MatchScoreTooltip({ breakdown }: { breakdown: { attribute: string; matched: boolean; weight: number }[] }) {
@@ -70,11 +71,34 @@ export default function SeriesCard({
   matchBreakdown,
   isOwn,
   hideMatchScore,
+  onDelete,
 }: SeriesCardProps) {
   const showMatchScore = matchScore !== undefined && !hideMatchScore;
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this? This can\u2019t be undone.")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/series/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        onDelete?.();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete series");
+      }
+    } catch {
+      alert("Failed to delete series");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Link href={`/series/${id}`} className="block group">
-      <div className={`bg-white rounded-xl border overflow-hidden hover:shadow-lg hover:border-purple-200 transition-all ${isOwn ? "border-l-2 border-l-teal-300 border-gray-200" : "border-gray-200"}`} title={isOwn ? "Your series" : undefined}>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-purple-200 transition-all">
         <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 relative">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
@@ -131,7 +155,7 @@ export default function SeriesCard({
           </h3>
           <p className="text-sm text-gray-500 mb-3">{guideName}</p>
 
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <div className="flex flex-wrap gap-1.5">
               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                 {procedureType}
@@ -141,10 +165,23 @@ export default function SeriesCard({
               </span>
             </div>
             {isOwn && (
-              <span className="text-[11px] text-gray-400 italic sm:hidden">Yours</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = "/dashboard/guide/content"; }}
+                  className="text-xs text-gray-500 hover:text-purple-600 font-medium"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="text-xs text-gray-500 hover:text-red-600 font-medium disabled:opacity-50"
+                >
+                  {deleting ? "..." : "Delete"}
+                </button>
+              </div>
             )}
           </div>
-
         </div>
       </div>
     </Link>

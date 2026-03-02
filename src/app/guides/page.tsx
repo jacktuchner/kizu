@@ -60,7 +60,7 @@ function GuideCard({ guide, isOwn, hideMatchScore }: { guide: Guide; isOwn?: boo
 
   return (
     <Link href={`/guides/${guide.id}`} className="block group">
-      <div className={`bg-white rounded-xl border p-6 hover:shadow-lg hover:border-cyan-200 transition-all h-full flex flex-col ${isOwn ? "border-l-2 border-l-teal-300 border-gray-200" : "border-gray-200"}`} title={isOwn ? "Your profile" : undefined}>
+      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-cyan-200 transition-all h-full flex flex-col">
         <div className="flex items-start gap-4 mb-4">
           <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-xl">
@@ -152,10 +152,15 @@ function GuideCard({ guide, isOwn, hideMatchScore }: { guide: Guide; isOwn?: boo
                   {averageRating.toFixed(1)} ({reviewCount})
                 </span>
               )}
-              {isOwn && (
-                <span className="text-[11px] text-gray-400 italic sm:hidden">Yours</span>
-              )}
             </div>
+            {isOwn && (
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = "/dashboard/guide/profile"; }}
+                className="text-xs text-gray-500 hover:text-cyan-600 font-medium"
+              >
+                Edit Profile
+              </button>
+            )}
             {profile.isAvailableForCalls && profile.hourlyRate && (
               <span className="text-lg font-bold text-cyan-700">
                 ${profile.hourlyRate}/hr

@@ -400,6 +400,7 @@ function WatchContent() {
                         matchBreakdown={s.matchBreakdown}
                         isOwn={!!currentUserId && s.guide?.id === currentUserId}
                         hideMatchScore={isGuideOnly || (!!currentUserId && s.guide?.id === currentUserId)}
+                        onDelete={() => setSeries((prev) => prev.filter((item) => item.id !== s.id))}
                       />
                     ))}
                   </div>
@@ -459,6 +460,7 @@ function WatchContent() {
                       guideVerified={rec.guide?.contributorStatus === "APPROVED"}
                       isOwn={!!currentUserId && rec.guide?.id === currentUserId}
                       hideMatchScore={isGuideOnly || (!!currentUserId && rec.guide?.id === currentUserId)}
+                      onDelete={() => setRecordings((prev) => prev.filter((r) => r.id !== rec.id))}
                     />
                   ))}
                 </div>

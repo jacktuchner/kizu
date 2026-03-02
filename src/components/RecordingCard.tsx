@@ -22,6 +22,7 @@ interface RecordingCardProps {
   guideVerified?: boolean;
   isOwn?: boolean;
   hideMatchScore?: boolean;
+  onDelete?: () => void;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -88,12 +89,34 @@ function MatchScoreTooltip({ breakdown }: { breakdown: { attribute: string; matc
 export default function RecordingCard({
   id, title, guideName, procedureType, ageRange, activityLevel,
   category, durationSeconds, isVideo, thumbnailUrl, viewCount, averageRating, matchScore, matchBreakdown,
-  guideVerified, isOwn, hideMatchScore,
+  guideVerified, isOwn, hideMatchScore, onDelete,
 }: RecordingCardProps) {
   const showMatchScore = matchScore !== undefined && !hideMatchScore;
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this? This can\u2019t be undone.")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/recordings/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        onDelete?.();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete recording");
+      }
+    } catch {
+      alert("Failed to delete recording");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   return (
     <Link href={`/recordings/${id}`} className="block group h-full">
-      <div className={`bg-white rounded-xl border overflow-hidden hover:shadow-lg hover:border-teal-200 transition-all h-full flex flex-col ${isOwn ? "border-l-2 border-l-teal-300 border-gray-200" : "border-gray-200"}`} title={isOwn ? "Your recording" : undefined}>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-teal-200 transition-all h-full flex flex-col">
         <div className="relative">
           {isVideo && thumbnailUrl ? (
             <div className="relative aspect-video bg-gray-900">
@@ -195,7 +218,21 @@ export default function RecordingCard({
               <span>{viewCount} views</span>
             </div>
             {isOwn && (
-              <span className="text-[11px] text-gray-400 italic sm:hidden">Yours</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.location.href = "/dashboard/guide/content"; }}
+                  className="text-xs text-gray-500 hover:text-teal-600 font-medium"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="text-xs text-gray-500 hover:text-red-600 font-medium disabled:opacity-50"
+                >
+                  {deleting ? "..." : "Delete"}
+                </button>
+              </div>
             )}
           </div>
         </div>
