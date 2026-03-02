@@ -174,9 +174,7 @@ export default function RecordingCard({
             <p className="text-sm text-gray-500">{guideName}</p>
             {guideVerified && <VerifiedBadge />}
             {isOwn && (
-              <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full font-medium">
-                Your recording
-              </span>
+              <span className="text-[11px] text-gray-400 italic">Your recording</span>
             )}
           </div>
 

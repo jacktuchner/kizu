@@ -90,9 +90,7 @@ function GuideCard({ guide, isOwn, hideMatchScore }: { guide: Guide; isOwn?: boo
             )}
           </div>
           {isOwn && (
-            <span className="text-xs bg-cyan-50 text-cyan-600 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
-              Your profile
-            </span>
+            <span className="text-[11px] text-gray-400 italic flex-shrink-0">Your profile</span>
           )}
           {guide.matchScore !== undefined && !hideMatchScore && (
             <div className="flex items-center flex-shrink-0">

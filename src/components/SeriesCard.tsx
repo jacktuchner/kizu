@@ -132,9 +132,7 @@ export default function SeriesCard({
           <div className="flex items-center gap-1.5 mb-3">
             <p className="text-sm text-gray-500">{guideName}</p>
             {isOwn && (
-              <span className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">
-                Your series
-              </span>
+              <span className="text-[11px] text-gray-400 italic">Your series</span>
             )}
           </div>
 

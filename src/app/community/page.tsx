@@ -396,9 +396,7 @@ export default function CommunityPage() {
                       <span className="font-medium text-gray-700">{thread.author?.name || "Anonymous"}</span>
                       {authorIsGuide && <VerifiedBadge />}
                       {isOwnThread && (
-                        <span className="text-xs bg-teal-50 text-teal-600 px-1.5 py-0.5 rounded-full font-medium">
-                          Your post
-                        </span>
+                        <span className="text-[11px] text-gray-400 italic">Your post</span>
                       )}
                       <span>&middot;</span>
                       <span>{timeAgo(thread.createdAt)}</span>
