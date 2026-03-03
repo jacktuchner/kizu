@@ -23,11 +23,18 @@ interface JournalEntry {
   updatedAt: string;
 }
 
+interface ProcedureInfo {
+  procedureType: string;
+  surgeryDate: string | null;
+  conditionCategory: string;
+}
+
 interface RecoveryJournalProps {
   procedureType: string;
   surgeryDate: string | null;
   currentWeek: number | undefined;
   conditionCategory?: string;
+  procedures?: ProcedureInfo[];
 }
 
 function parseDate(s: string): Date {
@@ -35,8 +42,13 @@ function parseDate(s: string): Date {
   return new Date(s);
 }
 
-export default function RecoveryJournal({ procedureType, surgeryDate, currentWeek, conditionCategory }: RecoveryJournalProps) {
-  const isChronicPain = conditionCategory === "CHRONIC_PAIN";
+export default function RecoveryJournal({ procedureType, surgeryDate, currentWeek, conditionCategory, procedures }: RecoveryJournalProps) {
+  const [selectedCondition, setSelectedCondition] = useState<string>(procedureType);
+  const isViewAll = selectedCondition === "__ALL__";
+  const activeProcInfo = procedures?.find((p) => p.procedureType === selectedCondition);
+  const effectiveConditionCategory = isViewAll ? conditionCategory : (activeProcInfo?.conditionCategory || conditionCategory);
+  const effectiveSurgeryDate = isViewAll ? surgeryDate : (activeProcInfo?.surgeryDate ?? surgeryDate);
+  const isChronicPain = effectiveConditionCategory === "CHRONIC_PAIN";
   const milestonePresets = isChronicPain ? JOURNAL_MILESTONE_PRESETS_CHRONIC_PAIN : JOURNAL_MILESTONE_PRESETS;
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [total, setTotal] = useState(0);
@@ -44,6 +56,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const hasMultipleConditions = (procedures?.length || 0) > 1;
 
   // Form state
   const [showForm, setShowForm] = useState(false);
@@ -61,7 +74,11 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
 
   const fetchEntries = useCallback(async (p: number) => {
     try {
-      const res = await fetch(`/api/journal?procedureType=${encodeURIComponent(procedureType)}&page=${p}&limit=10`);
+      const params = new URLSearchParams({ page: String(p), limit: "10" });
+      if (!isViewAll) {
+        params.set("procedureType", selectedCondition);
+      }
+      const res = await fetch(`/api/journal?${params}`);
       if (res.ok) {
         const data = await res.json();
         if (p === 1) {
@@ -78,7 +95,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
     } finally {
       setLoading(false);
     }
-  }, [procedureType]);
+  }, [selectedCondition, isViewAll]);
 
   useEffect(() => {
     setLoading(true);
@@ -169,20 +186,26 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
           resetForm();
         }
       } else {
+        // When in "View All" mode, create entries under the default (active) condition
+        const entryProcedure = isViewAll ? procedureType : selectedCondition;
+        const entryProcInfo = procedures?.find((p) => p.procedureType === entryProcedure);
+        const entrySurgeryDate = entryProcInfo?.surgeryDate ?? surgeryDate;
+        const entryConditionCategory = entryProcInfo?.conditionCategory || conditionCategory;
+        const entryIsChronicPain = entryConditionCategory === "CHRONIC_PAIN";
         const res = await fetch("/api/journal", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            procedureType,
+            procedureType: entryProcedure,
             painLevel: formPain,
             mobilityLevel: formMobility,
             mood: formMood,
             notes: formNotes || null,
             milestones: formMilestones,
             isShared: formShared,
-            surgeryDate,
-            conditionCategory,
-            ...(isChronicPain && {
+            surgeryDate: entrySurgeryDate,
+            conditionCategory: entryConditionCategory,
+            ...(entryIsChronicPain && {
               triggers: formTriggers,
               isFlare: formIsFlare,
               energyLevel: formEnergyLevel,
@@ -217,9 +240,9 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
     }
   }
 
-  // Compute week label for header (skip for chronic pain)
-  const weekLabel = isChronicPain ? null : (surgeryDate ? getTimeSinceSurgeryLabel(surgeryDate) : null);
-  const diagnosisLabel = isChronicPain && surgeryDate ? getTimeSinceDiagnosisLabel(surgeryDate) : null;
+  // Compute week label for header (skip for chronic pain and View All)
+  const weekLabel = isViewAll ? null : (isChronicPain ? null : (effectiveSurgeryDate ? getTimeSinceSurgeryLabel(effectiveSurgeryDate) : null));
+  const diagnosisLabel = isViewAll ? null : (isChronicPain && effectiveSurgeryDate ? getTimeSinceDiagnosisLabel(effectiveSurgeryDate) : null);
 
   // Nudge: no entries or last entry > 7 days ago
   const lastEntryDate = entries.length > 0 ? parseDate(entries[0].createdAt) : null;
@@ -384,8 +407,22 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
     <section className="bg-white rounded-xl border border-gray-200 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-xl font-bold">{journalTitle}</h2>
+          {hasMultipleConditions && (
+            <select
+              value={selectedCondition}
+              onChange={(e) => setSelectedCondition(e.target.value)}
+              className="border border-gray-200 rounded-lg px-2.5 py-1 text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            >
+              {procedures!.map((p) => (
+                <option key={p.procedureType} value={p.procedureType}>
+                  {p.procedureType}
+                </option>
+              ))}
+              <option value="__ALL__">View All</option>
+            </select>
+          )}
           {weekLabel && (
             <span className="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full font-medium">
               {weekLabel}
@@ -400,7 +437,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
         {!showForm && (
           <button
             onClick={openNewEntry}
-            className="text-sm bg-teal-600 text-white px-3 py-1.5 rounded-lg hover:bg-teal-700 font-medium flex items-center gap-1"
+            className="text-sm bg-teal-600 text-white px-3 py-1.5 rounded-lg hover:bg-teal-700 font-medium flex items-center gap-1 flex-shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -734,12 +771,17 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
                       day: "numeric",
                     })}
                   </span>
+                  {isViewAll && (
+                    <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-200">
+                      {entry.procedureType}
+                    </span>
+                  )}
                   {entry.recoveryWeek !== null && !isChronicPain && (
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                       Week {entry.recoveryWeek}
                     </span>
                   )}
-                  {isChronicPain && entry.isFlare && (
+                  {entry.isFlare && (
                     <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
                       Flare
                     </span>
@@ -779,7 +821,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
                   <span className="text-gray-300">/10</span>
                 </span>
                 <span className="text-lg">{JOURNAL_MOOD_EMOJIS[entry.mood - 1]}</span>
-                {isChronicPain && entry.energyLevel != null && (
+                {entry.energyLevel != null && (
                   <span className="flex items-center gap-1">
                     <span className="text-blue-500 font-medium">Energy {entry.energyLevel}</span>
                     <span className="text-gray-300">/10</span>
@@ -787,8 +829,8 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
                 )}
               </div>
 
-              {/* Triggers (chronic pain) */}
-              {isChronicPain && entry.triggers?.length > 0 && (
+              {/* Triggers */}
+              {entry.triggers?.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
                   {entry.triggers.map((t) => (
                     <span key={t} className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-200">

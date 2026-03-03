@@ -17,32 +17,33 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1", 10);
     const limit = parseInt(searchParams.get("limit") || "20", 10);
 
-    if (!procedureType) {
-      return NextResponse.json(
-        { error: "procedureType is required" },
-        { status: 400 }
-      );
-    }
-
     const offset = (page - 1) * limit;
 
-    // Get total count
-    const { count, error: countError } = await supabase
+    // Build query - procedureType is optional (omit for "View All")
+    let countQuery = supabase
       .from("JournalEntry")
       .select("id", { count: "exact", head: true })
+      .eq("patientId", userId);
+
+    let dataQuery = supabase
+      .from("JournalEntry")
+      .select("*")
       .eq("patientId", userId)
-      .eq("procedureType", procedureType);
+      .order("createdAt", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (procedureType) {
+      countQuery = countQuery.eq("procedureType", procedureType);
+      dataQuery = dataQuery.eq("procedureType", procedureType);
+    }
+
+    // Get total count
+    const { count, error: countError } = await countQuery;
 
     if (countError) throw countError;
 
     // Get paginated entries
-    const { data: entries, error } = await supabase
-      .from("JournalEntry")
-      .select("*")
-      .eq("patientId", userId)
-      .eq("procedureType", procedureType)
-      .order("createdAt", { ascending: false })
-      .range(offset, offset + limit - 1);
+    const { data: entries, error } = await dataQuery;
 
     if (error) throw error;
 

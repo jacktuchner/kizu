@@ -1071,6 +1071,11 @@ export default function SeekerDashboard() {
             surgeryDate={getProcedureData(activeProcedure, 0).surgeryDate || null}
             currentWeek={getCurrentRecoveryWeek(getProcedureData(activeProcedure, 0).surgeryDate || null) ?? undefined}
             conditionCategory={isChronicPainCondition(activeProcedure) ? "CHRONIC_PAIN" : "SURGERY"}
+            procedures={procedures.map((proc) => ({
+              procedureType: proc,
+              surgeryDate: getProcedureData(proc, 0).surgeryDate || null,
+              conditionCategory: isChronicPainCondition(proc) ? "CHRONIC_PAIN" : "SURGERY",
+            }))}
           />
         </section>
       )}
