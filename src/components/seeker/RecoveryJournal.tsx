@@ -406,7 +406,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
             <select
               value={selectedCondition}
               onChange={(e) => setSelectedCondition(e.target.value)}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-base bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-lg bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
             >
               {procedures!.map((p) => (
                 <option key={p.procedureType} value={p.procedureType}>
