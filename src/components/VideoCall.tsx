@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface VideoCallProps {
   roomUrl: string;
   callId: string;
-  scheduledAt: Date;
+  scheduledAt: string;
   durationMinutes: number;
   onLeave?: () => void;
 }
@@ -26,7 +27,7 @@ export default function VideoCall({
     // Check if call time is near (within 15 minutes before to end of call)
     const checkTime = () => {
       const now = new Date();
-      const callStart = new Date(scheduledAt);
+      const callStart = parseDate(scheduledAt);
       const callEnd = new Date(callStart.getTime() + durationMinutes * 60 * 1000);
       const earlyJoinWindow = new Date(callStart.getTime() - 15 * 60 * 1000); // 15 min before
 

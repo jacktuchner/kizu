@@ -10,6 +10,7 @@ import FilterSidebar from "@/components/FilterSidebar";
 import ContentAcknowledgmentModal from "@/components/ContentAcknowledgmentModal";
 import DisclaimerBanner from "@/components/DisclaimerBanner";
 import FeatureRequestModal from "@/components/FeatureRequestModal";
+import { parseDate } from "@/lib/dates";
 type SortOption = "match" | "newest" | "most_viewed" | "highest_rated";
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
@@ -174,7 +175,7 @@ function WatchContent() {
       case "match":
         return (b.matchScore || 0) - (a.matchScore || 0);
       case "newest":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime();
       case "most_viewed":
         return (b.viewCount || 0) - (a.viewCount || 0);
       case "highest_rated":

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface FeatureRequest {
   id: string;
@@ -78,7 +79,7 @@ export default function AdminFeatureRequestsPage() {
                     {req.email || "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                    {new Date(req.createdAt).toLocaleDateString()}
+                    {parseDate(req.createdAt).toLocaleDateString()}
                   </td>
                 </tr>
               ))}

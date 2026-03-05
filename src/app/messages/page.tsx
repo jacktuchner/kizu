@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { parseDate } from "@/lib/dates";
 
 interface Conversation {
   id: string;
@@ -23,7 +24,7 @@ interface Conversation {
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
-  const then = new Date(dateStr).getTime();
+  const then = parseDate(dateStr).getTime();
   const diff = now - then;
   const minutes = Math.floor(diff / 60000);
   if (minutes < 1) return "now";
@@ -32,7 +33,7 @@ function timeAgo(dateStr: string): string {
   if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days}d`;
-  return new Date(dateStr).toLocaleDateString();
+  return parseDate(dateStr).toLocaleDateString();
 }
 
 export default function MessagesPage() {

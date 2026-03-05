@@ -5,10 +5,11 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PROCEDURE_TYPES, CHRONIC_PAIN_CONDITIONS, FORUM_THREAD_TYPES, FORUM_PAGE_SIZE, getAllConditions } from "@/lib/constants";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { parseDate } from "@/lib/dates";
 
 function timeAgo(dateStr: string) {
   const now = Date.now();
-  const d = dateStr.endsWith("Z") || dateStr.includes("+") ? new Date(dateStr) : new Date(dateStr + "Z");
+  const d = parseDate(dateStr);
   const diff = now - d.getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";

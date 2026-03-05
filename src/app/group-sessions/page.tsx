@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PROCEDURE_TYPES } from "@/lib/constants";
+import { parseDate } from "@/lib/dates";
 
 interface GroupSession {
   id: string;
@@ -20,12 +21,6 @@ interface GroupSession {
     name: string;
     image?: string;
   };
-}
-
-// Supabase returns TIMESTAMP(3) without timezone suffix — values are UTC.
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
 }
 
 export default function GroupSessionsPage() {

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { parseDate } from "@/lib/dates";
 
 interface Message {
   id: string;
@@ -21,7 +22,7 @@ interface OtherParticipant {
 }
 
 function formatTime(dateStr: string): string {
-  const date = new Date(dateStr);
+  const date = parseDate(dateStr);
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
   const yesterday = new Date(now);

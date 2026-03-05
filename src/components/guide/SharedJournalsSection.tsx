@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface SharedSeeker {
   seekerId: string;
@@ -23,11 +24,6 @@ interface JournalEntry {
 }
 
 const MOOD_EMOJIS = ["", "\ud83d\ude1e", "\ud83d\ude15", "\ud83d\ude10", "\ud83d\ude42", "\ud83d\ude04"];
-
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
-}
 
 export default function SharedJournalsSection() {
   const [seekers, setSeekers] = useState<SharedSeeker[]>([]);

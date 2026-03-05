@@ -10,6 +10,7 @@ import {
   MAX_GROUP_CAPACITY,
   GROUP_SESSION_DURATIONS,
 } from "@/lib/constants";
+import { parseDate } from "@/lib/dates";
 
 interface GroupSession {
   id: string;
@@ -30,13 +31,6 @@ interface Props {
   sessions: GroupSession[];
   guideProcedures: string[];
   onSessionsUpdate: (sessions: GroupSession[]) => void;
-}
-
-// Supabase returns TIMESTAMP(3) without timezone suffix.
-// The server stores UTC via .toISOString(), so append "Z" to parse as UTC.
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
 }
 
 // Convert a datetime-local string (user's local time) to a UTC ISO string for the API
@@ -419,7 +413,7 @@ export default function GroupSessionsSection({ sessions, guideProcedures, onSess
                     <VideoCall
                       roomUrl={s.videoRoomUrl}
                       callId={s.id}
-                      scheduledAt={parseDate(s.scheduledAt)}
+                      scheduledAt={s.scheduledAt}
                       durationMinutes={s.durationMinutes}
                     />
                   </div>

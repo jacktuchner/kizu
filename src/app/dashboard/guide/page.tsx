@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
+import { parseDate } from "@/lib/dates";
 import CallRequestsSection from "@/components/guide/CallRequestsSection";
 import PurchaseHistory from "@/components/PurchaseHistory";
 import SharedJournalsSection from "@/components/guide/SharedJournalsSection";
@@ -69,7 +70,7 @@ export default function GuideOverviewPage() {
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <p className="text-sm text-gray-500">Upcoming Calls</p>
-          <p className="text-2xl font-bold text-teal-700">{calls.filter((c) => c.status === "CONFIRMED" && new Date(c.scheduledAt) > new Date()).length}</p>
+          <p className="text-2xl font-bold text-teal-700">{calls.filter((c) => c.status === "CONFIRMED" && parseDate(c.scheduledAt) > new Date()).length}</p>
         </div>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -124,7 +125,7 @@ export default function GuideOverviewPage() {
                   }`}>
                     {r.callId ? "Call" : "Recording"}
                   </span>
-                  <span className="text-xs text-gray-400">{new Date(r.createdAt).toLocaleDateString()}</span>
+                  <span className="text-xs text-gray-400">{parseDate(r.createdAt).toLocaleDateString()}</span>
                 </div>
                 {r.comment && <p className="text-sm text-gray-600">{r.comment}</p>}
               </div>

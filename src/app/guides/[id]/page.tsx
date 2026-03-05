@@ -10,6 +10,7 @@ import { RECOMMENDATION_CATEGORIES, GENDERS, isChronicPainCondition } from "@/li
 import { getTimeSinceSurgeryLabel, getTimeSinceDiagnosisLabel } from "@/lib/surgeryDate";
 import MessageButton from "@/components/MessageButton";
 import VerifiedBadge from "@/components/VerifiedBadge";
+import { parseDate } from "@/lib/dates";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -504,7 +505,7 @@ export default function GuideDetailPage() {
         ) : (
           <div className="space-y-4">
             {guide.reviewsReceived
-              .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .sort((a: any, b: any) => parseDate(b.createdAt).getTime() - parseDate(a.createdAt).getTime())
               .map((r: any) => (
               <div key={r.id} className="bg-white rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-2 mb-1">
@@ -520,7 +521,7 @@ export default function GuideDetailPage() {
                 </div>
                 {r.comment && <p className="text-sm text-gray-600">{r.comment}</p>}
                 {r.createdAt && (
-                  <p className="text-xs text-gray-400 mt-1">{new Date(r.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-gray-400 mt-1">{parseDate(r.createdAt).toLocaleDateString()}</p>
                 )}
               </div>
             ))}

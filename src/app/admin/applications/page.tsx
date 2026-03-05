@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { parseDate } from "@/lib/dates";
 
 type ApplicationStatus = "PENDING_REVIEW" | "APPROVED" | "REJECTED";
 
@@ -176,7 +177,7 @@ export default function AdminApplicationsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-gray-400">
-                    {new Date(app.createdAt).toLocaleDateString()}
+                    {parseDate(app.createdAt).toLocaleDateString()}
                   </span>
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                     app.status === "PENDING_REVIEW" ? "bg-amber-100 text-amber-700" :
@@ -268,7 +269,7 @@ export default function AdminApplicationsPage() {
                                 />
                               </div>
                             )}
-                            <p>Date: {new Date(app.agreementAcceptedAt).toLocaleString()}</p>
+                            <p>Date: {parseDate(app.agreementAcceptedAt).toLocaleString()}</p>
                             <p className="text-green-600 text-xs">Agreement version: {app.agreementVersion}</p>
                           </div>
                         ) : (
@@ -327,7 +328,7 @@ export default function AdminApplicationsPage() {
 
                       {app.status !== "PENDING_REVIEW" && (
                         <p className="text-xs text-gray-400">
-                          Reviewed on {new Date(app.updatedAt).toLocaleDateString()}
+                          Reviewed on {parseDate(app.updatedAt).toLocaleDateString()}
                         </p>
                       )}
                     </div>

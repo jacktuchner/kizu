@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import VideoCall from "@/components/VideoCall";
+import { parseDate } from "@/lib/dates";
 
 interface CallRequestsSectionProps {
   calls: any[];
@@ -35,7 +36,7 @@ export default function CallRequestsSection({ calls, onCallUpdate }: CallRequest
   }
 
   function getHoursUntilCall(scheduledAt: string): number {
-    return (new Date(scheduledAt).getTime() - Date.now()) / (1000 * 60 * 60);
+    return (parseDate(scheduledAt).getTime() - Date.now()) / (1000 * 60 * 60);
   }
 
   return (
@@ -49,7 +50,7 @@ export default function CallRequestsSection({ calls, onCallUpdate }: CallRequest
       ) : (
         <div className="space-y-4">
           {calls.map((call: any) => {
-            const isUpcoming = call.status === "CONFIRMED" && new Date(call.scheduledAt) > new Date(Date.now() - call.durationMinutes * 60 * 1000);
+            const isUpcoming = call.status === "CONFIRMED" && parseDate(call.scheduledAt) > new Date(Date.now() - call.durationMinutes * 60 * 1000);
             const canJoinCall = isUpcoming && call.videoRoomUrl;
             const hoursUntil = getHoursUntilCall(call.scheduledAt);
             const isLateCancel = hoursUntil < 24;
@@ -61,8 +62,8 @@ export default function CallRequestsSection({ calls, onCallUpdate }: CallRequest
                   <div>
                     <p className="font-medium">{call.seeker?.name || "Seeker"}</p>
                     <p className="text-sm text-gray-500">
-                      {new Date(call.scheduledAt).toLocaleDateString()} at{" "}
-                      {new Date(call.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {parseDate(call.scheduledAt).toLocaleDateString()} at{" "}
+                      {parseDate(call.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       {" "}&middot; {call.durationMinutes} min &middot; ${call.contributorPayout?.toFixed(2)} payout
                     </p>
                     {call.questionsInAdvance && (
@@ -116,7 +117,7 @@ export default function CallRequestsSection({ calls, onCallUpdate }: CallRequest
 
                 {canJoinCall && (
                   <div className="p-4 border-t border-gray-200">
-                    <VideoCall roomUrl={call.videoRoomUrl} callId={call.id} scheduledAt={new Date(call.scheduledAt)} durationMinutes={call.durationMinutes} />
+                    <VideoCall roomUrl={call.videoRoomUrl} callId={call.id} scheduledAt={call.scheduledAt} durationMinutes={call.durationMinutes} />
                   </div>
                 )}
               </div>

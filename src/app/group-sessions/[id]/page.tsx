@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import VideoCall from "@/components/VideoCall";
+import { parseDate } from "@/lib/dates";
 
 interface GroupSessionDetail {
   id: string;
@@ -35,12 +36,6 @@ interface GroupSessionDetail {
       timeSinceSurgery?: string;
     };
   };
-}
-
-// Supabase returns TIMESTAMP(3) without timezone suffix — values are UTC.
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
 }
 
 export default function GroupSessionDetailPage() {
@@ -296,7 +291,7 @@ export default function GroupSessionDetailPage() {
                   <VideoCall
                     roomUrl={groupSession.videoRoomUrl!}
                     callId={groupSession.id}
-                    scheduledAt={date}
+                    scheduledAt={groupSession.scheduledAt}
                     durationMinutes={groupSession.durationMinutes}
                   />
                 </div>

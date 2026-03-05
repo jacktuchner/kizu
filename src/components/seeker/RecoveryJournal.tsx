@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { JOURNAL_MILESTONE_PRESETS, JOURNAL_MILESTONE_PRESETS_CHRONIC_PAIN, JOURNAL_MOOD_EMOJIS, JOURNAL_TRIGGER_PRESETS } from "@/lib/constants";
 import { getTimeSinceSurgeryLabel, getTimeSinceDiagnosisLabel } from "@/lib/surgeryDate";
+import { parseDate } from "@/lib/dates";
 
 interface JournalEntry {
   id: string;
@@ -35,11 +36,6 @@ interface RecoveryJournalProps {
   currentWeek: number | undefined;
   conditionCategory?: string;
   procedures?: ProcedureInfo[];
-}
-
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
 }
 
 function ConditionDropdown({ value, options, onChange }: {
@@ -388,7 +384,7 @@ export default function RecoveryJournal({ procedureType, surgeryDate, currentWee
               className="text-[9px]"
               fill="#9ca3af"
             >
-              {new Date(e.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+              {parseDate(e.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
             </text>
           ))}
         </svg>

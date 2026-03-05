@@ -4,6 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { RECOMMENDATION_CATEGORIES } from "@/lib/constants";
+import { parseDate } from "@/lib/dates";
 
 interface Endorsement {
   id: string;
@@ -29,11 +30,6 @@ interface Recommendation {
   hasVoted: boolean;
   endorsements: Endorsement[];
   createdBy: { id: string; name: string; image?: string };
-}
-
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
 }
 
 export default function RecommendationDetailPage({ params }: { params: Promise<{ id: string }> }) {

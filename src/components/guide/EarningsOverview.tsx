@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface EarningsData {
   totalEarnings: number;
@@ -107,7 +108,7 @@ export default function EarningsOverview() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{tx.description}</p>
-                    <p className="text-xs text-gray-500">{new Date(tx.date).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500">{parseDate(tx.date).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <span className="text-sm font-semibold text-green-700">+${tx.amount.toFixed(2)}</span>

@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation";
 import { FORUM_THREAD_TYPES } from "@/lib/constants";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import ReportButton from "@/components/ReportButton";
+import { parseDate } from "@/lib/dates";
 
 function timeAgo(dateStr: string) {
   const now = Date.now();
-  const d = dateStr.endsWith("Z") || dateStr.includes("+") ? new Date(dateStr) : new Date(dateStr + "Z");
+  const d = parseDate(dateStr);
   const diff = now - d.getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";

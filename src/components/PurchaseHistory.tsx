@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface Payment {
   id: string;
@@ -116,7 +117,7 @@ export default function PurchaseHistory({ role }: { role: "seeker" | "guide" }) 
                 {payments.map((payment) => (
                   <tr key={payment.id} className="border-b border-gray-100 last:border-0">
                     <td className="py-3 pr-4 text-gray-600">
-                      {new Date(payment.createdAt).toLocaleDateString()}
+                      {parseDate(payment.createdAt).toLocaleDateString()}
                     </td>
                     <td className="py-3 pr-4">
                       <p className="font-medium text-gray-900">

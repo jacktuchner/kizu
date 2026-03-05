@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { parseDate } from "@/lib/dates";
 
 interface AvailabilitySlot {
   id: string;
@@ -160,8 +161,8 @@ export default function BookCallPage() {
           const slotEndMs = slotStartMs + duration * 60000;
 
           const overlaps = bookedCalls.some((call) => {
-            const callStart = new Date(call.start).getTime();
-            const callEnd = new Date(call.end).getTime();
+            const callStart = parseDate(call.start).getTime();
+            const callEnd = parseDate(call.end).getTime();
             return slotStartMs < callEnd && slotEndMs > callStart;
           });
 

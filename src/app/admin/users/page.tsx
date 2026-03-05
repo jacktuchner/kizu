@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { parseDate } from "@/lib/dates";
 
 interface User {
   id: string;
@@ -83,7 +84,7 @@ export default function AdminUsersPage() {
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString("en-US", {
+    return parseDate(dateStr).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",

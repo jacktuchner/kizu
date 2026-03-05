@@ -11,12 +11,7 @@ import VideoCall from "@/components/VideoCall";
 import GuideCTA from "@/components/GuideCTA";
 import PurchaseHistory from "@/components/PurchaseHistory";
 import CallReviewForm from "@/components/CallReviewForm";
-
-// Supabase returns TIMESTAMP(3) without timezone suffix — values are UTC.
-function parseDate(s: string): Date {
-  if (!s.endsWith("Z") && !s.includes("+")) return new Date(s + "Z");
-  return new Date(s);
-}
+import { parseDate } from "@/lib/dates";
 
 interface ProcedureProfile {
   procedureDetails?: string;
@@ -1151,7 +1146,7 @@ export default function SeekerDashboard() {
                       <VideoCall
                         roomUrl={gs.videoRoomUrl}
                         callId={gs.id}
-                        scheduledAt={parseDate(gs.scheduledAt)}
+                        scheduledAt={gs.scheduledAt}
                         durationMinutes={gs.durationMinutes}
                       />
                     </div>
@@ -1179,7 +1174,7 @@ export default function SeekerDashboard() {
         ) : (
           <div className="space-y-4">
             {calls.map((call: any) => {
-              const isUpcoming = call.status === "CONFIRMED" && new Date(call.scheduledAt) > new Date(Date.now() - call.durationMinutes * 60 * 1000);
+              const isUpcoming = call.status === "CONFIRMED" && parseDate(call.scheduledAt) > new Date(Date.now() - call.durationMinutes * 60 * 1000);
               const canJoinCall = isUpcoming && call.videoRoomUrl;
               const hoursUntil = getHoursUntilCall(call.scheduledAt);
               const isLateCancel = hoursUntil < 24;
@@ -1191,8 +1186,8 @@ export default function SeekerDashboard() {
                     <div>
                       <p className="font-medium">{call.guide?.name}</p>
                       <p className="text-sm text-gray-500">
-                        {new Date(call.scheduledAt).toLocaleDateString()} at{" "}
-                        {new Date(call.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {parseDate(call.scheduledAt).toLocaleDateString()} at{" "}
+                        {parseDate(call.scheduledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         {" "}&middot; {call.durationMinutes} min
                       </p>
                     </div>
@@ -1253,7 +1248,7 @@ export default function SeekerDashboard() {
                       <VideoCall
                         roomUrl={call.videoRoomUrl}
                         callId={call.id}
-                        scheduledAt={new Date(call.scheduledAt)}
+                        scheduledAt={call.scheduledAt}
                         durationMinutes={call.durationMinutes}
                       />
                     </div>

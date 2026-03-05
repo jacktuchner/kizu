@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { parseDate } from "@/lib/dates";
 
 interface Report {
   id: string;
@@ -187,7 +188,7 @@ export default function AdminReportsPage() {
     }
     if (report.recording) return report.recording.title;
     if (report.reportedUser) return report.reportedUser.name || report.reportedUser.email;
-    if (report.call) return `Call on ${new Date(report.call.scheduledAt).toLocaleDateString()}`;
+    if (report.call) return `Call on ${parseDate(report.call.scheduledAt).toLocaleDateString()}`;
     return "Unknown";
   }
 
@@ -223,7 +224,7 @@ export default function AdminReportsPage() {
   }
 
   function formatDate(dateStr: string) {
-    return new Date(dateStr).toLocaleDateString("en-US", {
+    return parseDate(dateStr).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
